@@ -20,13 +20,12 @@ def get_data(tickers, start_date=None, end_date=None, index_as_date=True, interv
     combined = reduce(lambda x, y: x.append(y), price_data.values())
     return combined
 
-# def get_balance_sheet(ticker, yearly = True):
 
-# ticker='AAPL'
-# ticker_file = "c:/temp/yahoo_fin_{}.csv".format(ticker)
-# data = si.get_data(ticker,start_date = '01/01/2000' )
-# data.to_csv(ticker_file)
-# print(data.tail())
+def get_balance_sheet(tickers, yearly=True):
+
+    dict_data = {ticker: si.get_balance_sheet(ticker.strip(), yearly) for ticker in tickers}
+
+    return dict_data
 
 # Analysts = si.get_analysts_info(ticker)
 # print (Analysts)

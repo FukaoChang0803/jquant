@@ -27,25 +27,59 @@ def read_price_file():
     return df_price
 
 
-def get_historical_price():
+def get_historical_price(tickers, db_upd=True, output_file=False):
     """
     :return: DataFrame df_price
     """
-    tickers = (SystemEnv.g_tick_list[SystemEnv.ConfigSection.E_TICKER.value]).split(',')
+    # tickers = (SystemEnv.g_tick_list[SystemEnv.ConfigSection.E_TICKER.value]).split(',')
+
     df_price = yahoo_fin_Market_Data.get_data(tickers, index_as_date=False)
 
     # price_file = os.path.join(SystemEnv.g_price_file['sourcefolder'], "historical_price.csv")
     #
     # df_price.to_csv(price_file)
 
-    return df_price
+    """
+            data type datetime64[ns] -> convert dt.date ---> object
+            DataFrame- the data type of date column is datetime64[ns] 
+            In order to match the data type of DATE, it needs to do the data type conversion
+            string from timestamp : row.date.strftime('%Y-%m-%d'),
+        """
+    df_price['date'] = df_price['date'].dt.date
+    ticker_group = df_price.groupby('ticker')
+    # print( type(ticker_group)) #<class 'pandas.core.groupby.generic.DataFrameGroupBy'>
 
-def calc_atr():
-        pass
+    for name, grp in ticker_group:
+        grp = TimeSeriesTicker.calc_atr(grp)
+        if ( output_file  == True ) :
+            price_file = os.path.join(SystemEnv.g_price_file['sourcefolder'], name+"_historical_price.csv")
+            grp.to_csv(price_file)
+        if (db_upd == True) :
+            DBPrice.update_price(grp)
+
+    # return df_price
 
 
-def db_update_price():
-        pass
+def get_balance_sheet(tickers, yearly=True):
+
+    b = yahoo_fin_Market_Data.get_balance_sheet(tickers,yearly=False)
+
+    for k, v in b.items():
+        print(k)
+        print(v)
+
+        out_file = os.path.join(SystemEnv.g_price_file['sourcefolder'], k+"_balance_sheet.csv")
+        v.T.to_csv(out_file)
+
+# Index(['totalLiab', 'totalStockholderEquity', 'otherCurrentLiab',
+#        'totalAssets', 'commonStock', 'otherCurrentAssets', 'retainedEarnings',
+#        'otherLiab', 'treasuryStock', 'otherAssets', 'cash',
+#        'totalCurrentLiabilities', 'shortLongTermDebt',
+#        'otherStockholderEquity', 'propertyPlantEquipment',
+#        'totalCurrentAssets', 'longTermInvestments', 'netTangibleAssets',
+#        'shortTermInvestments', 'netReceivables', 'longTermDebt', 'inventory',
+#        'accountsPayable'],
+
 
 def test():
 
@@ -84,21 +118,14 @@ def test():
 def main():
 
     SystemEnv.read_config('./config.ini')
-    df_price = get_historical_price()
 
-    """
-        data type datetime64[ns] -> convert dt.date ---> object
-        DataFrame- the data type of date column is datetime64[ns] 
-        In order to match the data type of DATE, it needs to do the data type conversion
-        string from timestamp : row.date.strftime('%Y-%m-%d'),
-    """
-    df_price['date'] = df_price['date'].dt.date
-    ticker_group = df_price.groupby('ticker')
-    # print( type(ticker_group)) #<class 'pandas.core.groupby.generic.DataFrameGroupBy'>
+    tickers = (SystemEnv.g_tick_list[SystemEnv.ConfigSection.E_TICKER.value]).split(',')
 
-    for name, grp in ticker_group:
-        grp = TimeSeriesTicker.calc_atr(grp)
-        DBPrice.update_price(grp)
+    # get_historical_price(tickers, db_upd=False, output_file=True)
+    tickers = ['AAPL','AMZN']
+
+    get_balance_sheet(tickers)
+
 
 
 if __name__ == '__main__':

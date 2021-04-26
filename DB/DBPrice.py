@@ -1,9 +1,7 @@
-from datetime import datetime
-import pandas as pd
-import mysql.connector
+# from datetime import datetime
+# import pandas as pd
+# import mysql.connector
 from mysql.connector import Error
-
-from Instrument import TimeSeriesTicker
 from DB import dbconnect
 
 
@@ -51,6 +49,7 @@ def update_balance_sheet(dict_balance_sheet):
             cursor.close()
             conn.close()
 
+
 def update_income_statement(dict_income_statement):
 
     try:
@@ -61,11 +60,35 @@ def update_income_statement(dict_income_statement):
             df_sheet.fillna(0, inplace=True)
             dict_sheet = df_sheet.to_dict()
             for endDate, row in dict_sheet.items():
-                 dt_endDate =  endDate.to_pydatetime()
-
+                dt_endDate =  endDate.to_pydatetime()
                 for item, vlue in row.items():
                     parameters = [ticker, dt_endDate, item, vlue]
                     cursor.callproc('usp_IncomeStatement_IU', parameters)
+
+        conn.commit()
+    except Error as e:
+        print("Failed to execute stored procedure: {}".format(e))
+    finally:
+        if conn.is_connected():
+            cursor.close()
+            conn.close()
+
+
+
+def update_cash_flow(dict_cash_flow):
+
+    try:
+        conn = dbconnect.connect()
+        cursor = conn.cursor()
+
+        for ticker, df_sheet in dict_cash_flow.items():
+            df_sheet.fillna(0, inplace=True)
+            dict_sheet = df_sheet.to_dict()
+            for endDate, row in dict_sheet.items():
+                dt_endDate =  endDate.to_pydatetime()
+                for item, vlue in row.items():
+                    parameters = [ticker, dt_endDate, item, vlue]
+                    cursor.callproc('usp_CashFlow_IU', parameters)
 
         conn.commit()
     except Error as e:

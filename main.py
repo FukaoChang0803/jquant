@@ -1,8 +1,6 @@
 import os
 # --------------------------------
 import pandas as pd
-import mysql.connector
-from mysql.connector import Error
 # ---------------------------------
 from Util import FileUtil, SystemEnv
 from Instrument import TimeSeriesTicker
@@ -25,6 +23,9 @@ def read_price_file():
     df_price = pd.read_csv(price_file)
 
     return df_price
+"""
+Scraping Financials
+"""
 
 
 def get_historical_price(tickers, db_upd=True, output_file=False):
@@ -64,8 +65,6 @@ def get_balance_sheet(tickers, yearly=True,  db_upd=True, output_file=False):
 
     dict_balance_sheet = yahoo_fin_Market_Data.get_balance_sheet(tickers,yearly)
 
-    # print( dict_balance_sheet)
-
     if db_upd :
         DBPrice.update_balance_sheet(dict_balance_sheet)
 
@@ -74,14 +73,50 @@ def get_balance_sheet(tickers, yearly=True,  db_upd=True, output_file=False):
             out_file = os.path.join(SystemEnv.g_price_file['sourcefolder'], ticker + "_balance_sheet.csv")
             df_sheet.to_csv(out_file)
 
+
+def get_income_statement(tickers, yearly=True,  db_upd=True, output_file=False):
+
+    dict_income_statement = yahoo_fin_Market_Data.get_income_statement(tickers,yearly)
+
+    print(dict_income_statement)
+
+    if db_upd :
+        DBPrice.update_income_statement(dict_income_statement)
+
+    if output_file:
+        for ticker, df_sheet in dict_income_statement.items():
+            out_file = os.path.join(SystemEnv.g_price_file['sourcefolder'], ticker + "_income_statement.csv")
+            df_sheet.to_csv(out_file)
+
+
+def get_cash_flow(tickers, yearly=True,  db_upd=True, output_file=False):
+
+    dict_cash_flow = yahoo_fin_Market_Data.get_cash_flow(tickers,yearly)
+
+    if db_upd :
+        DBPrice.update_cash_flow(dict_cash_flow)
+
+    if output_file:
+        for ticker, df_sheet in dict_cash_flow.items():
+            out_file = os.path.join(SystemEnv.g_price_file['sourcefolder'], ticker + "_cash_flow.csv")
+            df_sheet.to_csv(out_file)
+
+
+
+
 def main():
 
     SystemEnv.read_config('c:\Temp\jquant\config.ini')
     tickers = (SystemEnv.g_tick_list[SystemEnv.ConfigSection.E_TICKER.value])
+    yearly=False
+    db_upd=True
+    output_file=False
     # get_historical_price(tickers, db_upd=False, output_file=True)
-    get_balance_sheet(tickers, yearly=False, db_upd=True)
-
+    # get_balance_sheet(tickers, yearly, db_upd, output_file)
+    # get_income_statement(tickers, yearly, db_upd,output_file)
+    get_cash_flow(tickers, yearly, db_upd,output_file)
     print("Done.................")
+
 
 if __name__ == '__main__':
     main()

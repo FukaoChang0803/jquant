@@ -29,6 +29,11 @@ def get_income_statement(tickers, yearly=True):
     dict_data = {ticker: si.get_income_statement(ticker, yearly) for ticker in tickers}
     return dict_data
 
+def get_cash_flow(tickers, yearly=True):
+    dict_data = {ticker: si.get_cash_flow(ticker, yearly) for ticker in tickers}
+    return dict_data
+
+
 # Analysts = si.get_analysts_info(ticker)
 # print (Analysts)
 

@@ -51,7 +51,20 @@ class ConfigSection(Enum):
     E_MYSQL = 'mysql'
     E_PRICE_FILE = 'pricefile'
     E_TICKER = 'ticker'
-    
+
+def _listfstr( _dict ):
+    """
+     no empty strings at the start or end of the string if the string has leading or trailing whitespace.
+    :param _dict:
+    :return: _dict
+    """
+
+    for k, v in _dict.items():
+        _dict[k] = v.split()
+        # if ',' in v:
+            # _dict[k] = "".join(v.split()).split(',')
+    return  _dict
+
 def read_config(filename='config.ini'):
 
     """ Read database configuration file and return a dictionary object
@@ -85,12 +98,13 @@ def read_config(filename='config.ini'):
     parser.read(filename)
     sections = parser.sections()
     for section in parser.sections():
+
         if section == ConfigSection.E_MYSQL.value:
             g_mysql_connection = configSectionMap(section)
         elif section == ConfigSection.E_PRICE_FILE.value:
             g_price_file = configSectionMap(section)
         elif section == ConfigSection.E_TICKER.value:
-            g_tick_list = configSectionMap(section)
+            g_tick_list = _listfstr ( configSectionMap(section) )
 
 
 """

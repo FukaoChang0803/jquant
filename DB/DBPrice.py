@@ -19,13 +19,14 @@ def update_price(df_price):
     except Error as e:
         print("Failed to execute stored procedure: {}".format(e))
     finally:
-        if ( conn.is_connected() ):
+        if conn.is_connected():
             cursor.close()
             conn.close()
         # print("MySQL connection is closed")
 
 
 def update_balance_sheet(dict_balance_sheet):
+
     try:
         conn = dbconnect.connect()
         cursor = conn.cursor()
@@ -39,7 +40,6 @@ def update_balance_sheet(dict_balance_sheet):
                 # print( type(dt_endDate))
 
                 for item, vlue in row.items():
-                    # print('{},{},{},{}'.format(tikcer,dt_endDate,item,vlue) )
                     parameters = [ticker, dt_endDate, item, vlue]
                     cursor.callproc('usp_BalanceSheet_IU', parameters)
 
@@ -47,7 +47,7 @@ def update_balance_sheet(dict_balance_sheet):
     except Error as e:
         print("Failed to execute stored procedure: {}".format(e))
     finally:
-        if ( conn.is_connected() ):
+        if conn.is_connected():
             cursor.close()
             conn.close()
         # print("MySQL connection is closed")

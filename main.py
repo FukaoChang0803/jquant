@@ -62,7 +62,9 @@ def get_historical_price(tickers, db_upd=True, output_file=False):
 
 def get_balance_sheet(tickers, yearly=True,  db_upd=True, output_file=False):
 
-    dict_balance_sheet = yahoo_fin_Market_Data.get_balance_sheet(tickers,yearly=False)
+    dict_balance_sheet = yahoo_fin_Market_Data.get_balance_sheet(tickers,yearly)
+
+    # print( dict_balance_sheet)
 
     if db_upd :
         DBPrice.update_balance_sheet(dict_balance_sheet)
@@ -74,11 +76,12 @@ def get_balance_sheet(tickers, yearly=True,  db_upd=True, output_file=False):
 
 def main():
 
-    SystemEnv.read_config('./config.ini')
-    tickers = (SystemEnv.g_tick_list[SystemEnv.ConfigSection.E_TICKER.value]).split(',')
+    SystemEnv.read_config('c:\Temp\jquant\config.ini')
+    tickers = (SystemEnv.g_tick_list[SystemEnv.ConfigSection.E_TICKER.value])
     # get_historical_price(tickers, db_upd=False, output_file=True)
-    get_balance_sheet(tickers, db_upd=True)
+    get_balance_sheet(tickers, yearly=False, db_upd=True)
 
+    print("Done.................")
 
 if __name__ == '__main__':
     main()

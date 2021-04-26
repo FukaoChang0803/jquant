@@ -22,13 +22,11 @@ def get_data(tickers, start_date=None, end_date=None, index_as_date=True, interv
 
 
 def get_balance_sheet(tickers, yearly=True):
-
-    # dict_data={}
-    # for ticker in tickers:
-    #     print(ticker)
-    #     dict_data[ticker] = si.get_balance_sheet(ticker,yearly)
     dict_data = {ticker: si.get_balance_sheet(ticker,yearly) for ticker in tickers}
+    return dict_data
 
+def get_income_statement(tickers, yearly=True):
+    dict_data = {ticker: si.get_income_statement(ticker, yearly) for ticker in tickers}
     return dict_data
 
 # Analysts = si.get_analysts_info(ticker)

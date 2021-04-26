@@ -50,4 +50,27 @@ def update_balance_sheet(dict_balance_sheet):
         if conn.is_connected():
             cursor.close()
             conn.close()
-        # print("MySQL connection is closed")
+
+def update_income_statement(dict_income_statement):
+
+    try:
+        conn = dbconnect.connect()
+        cursor = conn.cursor()
+
+        for ticker, df_sheet in dict_income_statement.items():
+            df_sheet.fillna(0, inplace=True)
+            dict_sheet = df_sheet.to_dict()
+            for endDate, row in dict_sheet.items():
+                 dt_endDate =  endDate.to_pydatetime()
+
+                for item, vlue in row.items():
+                    parameters = [ticker, dt_endDate, item, vlue]
+                    cursor.callproc('usp_IncomeStatement_IU', parameters)
+
+        conn.commit()
+    except Error as e:
+        print("Failed to execute stored procedure: {}".format(e))
+    finally:
+        if conn.is_connected():
+            cursor.close()
+            conn.close()

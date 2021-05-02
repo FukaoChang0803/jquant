@@ -5,6 +5,7 @@ from mysql.connector import Error
 from DB import dbconnect
 
 
+
 def update_price(df_price):
     try:
         conn = dbconnect.connect()
@@ -35,7 +36,7 @@ def update_balance_sheet(dict_balance_sheet):
             for endDate, row in dict_sheet.items():
                 # print( type(endDate)) # <class 'pandas._libs.tslibs.timestamps.Timestamp'>
                 dt_endDate =  endDate.to_pydatetime()
-                # print( type(dt_endDate))
+                print( type(dt_endDate))
 
                 for item, vlue in row.items():
                     parameters = [ticker, dt_endDate, item, vlue]

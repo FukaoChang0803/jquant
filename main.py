@@ -6,7 +6,7 @@ from Util import FileUtil, SystemEnv
 from Instrument import TimeSeriesTicker
 from DB import DBPrice
 from MarketData import yahoo_fin_Market_Data
-
+import  TDAmeritrade
 
 def read_price_file():
     # SystemEnv.read_config('config.ini')
@@ -35,9 +35,9 @@ def get_historical_price(tickers, db_upd=True, output_file=False):
     # tickers = (SystemEnv.g_tick_list[SystemEnv.ConfigSection.E_TICKER.value]).split(',')
 
     df_price = yahoo_fin_Market_Data.get_data(tickers, index_as_date=False)
-
-    # price_file = os.path.join(SystemEnv.g_price_file['sourcefolder'], "historical_price.csv")
+    print(df_price.info())
     #
+    # price_file = os.path.join(SystemEnv.g_price_file['sourcefolder'], "historical_price.csv")
     # df_price.to_csv(price_file)
 
     """
@@ -46,7 +46,9 @@ def get_historical_price(tickers, db_upd=True, output_file=False):
             In order to match the data type of DATE, it needs to do the data type conversion
             string from timestamp : row.date.strftime('%Y-%m-%d'),
         """
+    # print ('Before change -', type(df_price['date']))
     df_price['date'] = df_price['date'].dt.date
+    print('After change -', df_price.info())
     ticker_group = df_price.groupby('ticker')
     # print( type(ticker_group)) #<class 'pandas.core.groupby.generic.DataFrameGroupBy'>
 
@@ -111,10 +113,10 @@ def main():
     yearly=False
     db_upd=True
     output_file=False
-    # get_historical_price(tickers, db_upd=False, output_file=True)
+    get_historical_price(tickers, db_upd, output_file)
     # get_balance_sheet(tickers, yearly, db_upd, output_file)
     # get_income_statement(tickers, yearly, db_upd,output_file)
-    get_cash_flow(tickers, yearly, db_upd,output_file)
+    # get_cash_flow(tickers, yearly, db_upd,output_file)
     print("Done.................")
 
 

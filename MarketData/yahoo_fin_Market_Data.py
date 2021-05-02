@@ -15,8 +15,10 @@ def get_data(tickers, start_date=None, end_date=None, index_as_date=True, interv
     :param tickers is a list of Equity tickers:
     :return :  
     """
+    # DatetimeIndex: 10182  entries, 1980 - 12 - 12   to    2021 - 04 - 30
     price_data = {ticker: si.get_data(ticker.strip(), start_date, end_date, index_as_date, interval)
                   for ticker in tickers}
+
     combined = reduce(lambda x, y: x.append(y), price_data.values())
     return combined
 
